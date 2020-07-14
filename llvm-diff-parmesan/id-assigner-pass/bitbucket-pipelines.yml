@@ -1,0 +1,24 @@
+image: fedora:31
+
+pipelines:
+    default:
+        - step:
+            caches:
+                - dnf
+            script:
+                - dnf install -y clang llvm-devel cmake make gcc-c++
+                                 python3-lit
+                - sed --in-place=.orig
+                      's/if (ARG_SHARED)/if (ARG_SHARED OR ARG_MODULE)/'
+                      /usr/lib64/cmake/llvm/AddLLVM.cmake
+                - mkdir /tmp/build
+                - cd /tmp/build
+                - cmake -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTING=ON
+                        -DCMAKE_INSTALL_PREFIX=/tmp/install_prefix
+                        $BITBUCKET_CLONE_DIR
+                - make check
+                - make install
+
+definitions:
+    caches:
+        dnf: /var/cache/dnf

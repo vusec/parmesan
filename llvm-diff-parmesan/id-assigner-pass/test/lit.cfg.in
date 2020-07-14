@@ -1,0 +1,17 @@
+import lit.formats
+from pathlib import Path
+
+config.name = '@PROJECT_NAME@'
+config.test_format = lit.formats.ShTest(True)
+
+config.test_source_root = '@CMAKE_CURRENT_SOURCE_DIR@'
+config.suffixes = ['.ll', '.c', '.cpp']
+
+pass_path = Path('@PASS_PATH@')
+if not pass_path.is_file():
+    print(f'Pass not found: {pass_path}')
+    exit(1)
+
+config.substitutions.append(('%opt_idassign', f'opt -load {pass_path}'))
+config.substitutions.append(
+    ('%clang_tracer', f'clang -Xclang -load -Xclang {pass_path}'))
