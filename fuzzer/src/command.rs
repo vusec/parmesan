@@ -90,7 +90,7 @@ impl CommandOpt {
     ) -> Self {
         let mode = InstrumentationMode::from(mode);
         
-        let tmp_dir = make_absolute(&out_dir.join(TMP_DIR));
+        let tmp_dir = out_dir.join(TMP_DIR);
         tmpfs::create_tmpfs_dir(&tmp_dir);
 
         let out_file = tmp_dir.join(INPUT_FILE).to_str().unwrap().to_owned();
