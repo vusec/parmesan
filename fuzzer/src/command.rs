@@ -56,6 +56,23 @@ pub struct CommandOpt {
     pub directed_only: bool,
 }
 
+pub fn make_absolute(path: &Path) -> PathBuf {
+    if path.is_relative() {
+        let abs_path = env::current_dir().unwrap();
+        return abs_path.join(path);
+    }
+    path.to_path_buf()
+}
+
+pub fn make_absolute_str(path_str: &str) -> String {
+    let path = Path::new(path_str);
+    if path.is_relative() {
+        let abs_path = env::current_dir().unwrap();
+        return abs_path.join(path).to_str().unwrap().to_string();
+    }
+    path.to_path_buf().to_str().unwrap().to_string()
+}
+
 impl CommandOpt {
     pub fn new(
         mode: &str,
@@ -73,7 +90,7 @@ impl CommandOpt {
     ) -> Self {
         let mode = InstrumentationMode::from(mode);
         
-        let tmp_dir = out_dir.join(TMP_DIR);
+        let tmp_dir = make_absolute(&out_dir.join(TMP_DIR));
         tmpfs::create_tmpfs_dir(&tmp_dir);
 
         let out_file = tmp_dir.join(INPUT_FILE).to_str().unwrap().to_owned();
@@ -101,7 +118,7 @@ impl CommandOpt {
         );
 
         let mut tmp_args = pargs.clone();
-        let main_bin = tmp_args[0].clone();
+        let main_bin = make_absolute_str(&tmp_args[0].clone());
         let main_args: Vec<String> = tmp_args.drain(1..).collect();
         let uses_asan = check_dep::check_asan(&main_bin);
         if uses_asan && mem_limit != 0 {
@@ -131,7 +148,7 @@ impl CommandOpt {
             track_args.push(track_target.to_string());
             track_args.extend(main_args.clone());
         } else {
-            track_bin = track_target.to_string();
+            track_bin = make_absolute_str(&track_target);
             track_args = main_args.clone();
         }
         let sanopt_bin = sanopt_target.map(|s| s.to_string());
