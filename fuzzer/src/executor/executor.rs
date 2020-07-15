@@ -418,7 +418,7 @@ impl Executor {
                 fixed_cond.offsets.append(&mut fixed_offsets);
                 let var_len = fixed_cond.variables.len();
                 for (i,v) in dyncfg.get_magic_bytes(edge) {
-                    if (i < var_len - 1) {
+                    if i < var_len - 1 {
                         fixed_cond.variables[i] = v;
                         debug!("FIX VAR {} to '{}'", i, v);
                     }
