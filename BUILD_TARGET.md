@@ -27,7 +27,7 @@ mkdir build # Create a build dir
 
 ## 3) Build bitcode file using gclang
 ```bash
-cd bintuils-2.34
+cd binutils-2.34
 CC=gclang CXX=gclang++ ./configure --with-pic
 make -j$(nprocs) # Build in parallel
 cd binutils/
@@ -54,7 +54,7 @@ cp /usr/bin/whoami in/
 # Add small dummy file
 echo "AAAAAAAA" > in/a.txt
 # Build everything
-python $PARMESAN_BASE/tools/compile_bc.py objdump.bc -s -d @@
+python3 $PARMESAN_BASE/tools/compile_bc.py objdump.bc -s -d @@
 # Will take a long time, go get a coffee or a beer
 # ...
 # After some time it will print the command you can use
