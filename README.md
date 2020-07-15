@@ -47,7 +47,7 @@ This will output a file `targets.json`, which you provide to ParmeSan with the `
 
 For example:
 ```bash
-$(pwd)/bin/fuzzer -c ./targets.json -i in -o out -t base64.track -- base64.fast -d @@`
+$(pwd)/bin/fuzzer -c ./targets.json -i in -o out -t ./base64.track -- ./base64.fast -d @@`
 ```
 
 ## Options

@@ -66,7 +66,7 @@ Now you can start fuzzing using the command printed in the previous step.
 
 ```bash
 # Something like: 
-/path/to/parmesan/bin/fuzzer -c ./targets.pruned.json -i in -o out -t objdump.track -s objdump.san.fast -- objdump.fast -s -d @@
+/path/to/parmesan/bin/fuzzer -c ./targets.pruned.json -i in -o out -t ./objdump.track -s ./objdump.san.fast -- ./objdump.fast -s -d @@
 ```
 
 This should start up the fuzzer (with the sanopt optimization), and show you something like the following:
