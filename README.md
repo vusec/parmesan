@@ -100,4 +100,7 @@ You can also get the pre-built docker image of ParmeSan.
 
 ```bash
 docker pull vusec/parmesan
+docker run --rm -it vusec/parmesan
+# In the container you can build objdump
+/parmesan/misc/build_objdump.sh
 ```

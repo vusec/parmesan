@@ -28,7 +28,7 @@ mkdir build # Create a build dir
 ## 3) Build bitcode file using gclang
 ```bash
 cd binutils-2.34
-CC=gclang CXX=gclang++ ./configure --with-pic
+CC=gclang CXX=gclang++ CFLAGS="-fPIC" ./configure --with-pic
 make -j$(nprocs) # Build in parallel
 cd binutils/
 get-bc objdump
