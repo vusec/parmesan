@@ -17,3 +17,7 @@ set +x
 echo "Please set:"
 echo "export PATH=\$PREFIX/clang+llvm/bin:\$PATH"
 echo "export LD_LIBRARY_PATH=\$PREFIX/clang+llvm/lib:\$LD_LIBRARY_PATH"
+
+## Write the same info to a file
+echo "export PATH=\$PREFIX/clang+llvm/bin:\$PATH" > parmesan.env
+echo "export LD_LIBRARY_PATH=\$PREFIX/clang+llvm/lib:\$LD_LIBRARY_PATH" >> parmesan.env

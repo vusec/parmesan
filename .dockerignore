@@ -1,0 +1,3 @@
+target/
+llvm_mode/build
+tools/llvm-diff-parmesan/build

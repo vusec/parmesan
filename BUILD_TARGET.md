@@ -9,7 +9,7 @@ Also install the required tools (`gclang`) using `build/install_tools.sh`.
 
 ```bash
 # You might need to change this one to point to your LLVM install path
-source angora.env 
+source parmesan.env
 build/build.sh
 export PARMESAN_BASE=$(pwd)
 ```
