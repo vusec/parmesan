@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 import sys
 import os
 from pathlib import Path
@@ -43,7 +43,7 @@ def build_pipeline(bc_file, target_flags="@@", profiling_input_dir="in", is_cpp=
     run_cmd(f"opt -load {ID_ASSIGNER_PATH} -idassign -idassign-emit-cfg \
             -idassign-cfg-file cfg.dat {name}.fast.ll")
     #8) Prune targets
-    run_cmd(f"python {PRUNE_SCRIPT_PATH} {targets_file} {name}.diff cmp.map {profiling_input_dir} ./{name}.track {target_flags} > targets.pruned.json")
+    run_cmd(f"python3.8 {PRUNE_SCRIPT_PATH} {targets_file} {name}.diff cmp.map {profiling_input_dir} ./{name}.track {target_flags} > targets.pruned.json")
 
     # Print fuzzing command
     print("You can now run your target application (with SanOpt enabled) using:")

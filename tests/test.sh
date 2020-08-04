@@ -24,7 +24,7 @@ fi
 
 
 envs="BUILD_TYPE=${BUILD_TYPE} LOG_TYPE=${LOG_TYPE}"
-fuzzer="../angora_fuzzer"
+fuzzer="../bin/fuzzer"
 input="./input"
 output="./output"
 
