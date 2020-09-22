@@ -524,9 +524,17 @@ void AngoraLLVMPass::resetIndirectCallContext(IRBuilder<> *IRB) {
 }
 
 void AngoraLLVMPass::processCall(Instruction *Inst) {
-  
-  CallInst *CI = dyn_cast<CallInst>(Inst);
-  Function* fp = CI->getCalledFunction();
+
+  Function* fp = nullptr;
+  if (CallInst *CI = dyn_cast<CallInst>(Inst)) {
+    fp = CI->getCalledFunction();
+  }
+  else if (InvokeInst *II = dyn_cast<InvokeInst>(Inst)) {
+    fp = II->getCalledFunction();
+  }
+  else {
+    llvm_unreachable("ProcessCall function received instruction of unsupported type.");
+  }
   if (fp != NULL) {
     visitCompareFunc(Inst);
     visitExploitation(Inst);
