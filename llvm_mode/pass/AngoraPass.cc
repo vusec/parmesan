@@ -525,8 +525,14 @@ void AngoraLLVMPass::resetIndirectCallContext(IRBuilder<> *IRB) {
 
 void AngoraLLVMPass::processCall(Instruction *Inst) {
   
-  CallInst *CI = dyn_cast<CallInst>(Inst);
-  Function* fp = CI->getCalledFunction();
+  Function *fp;
+  if (isa<CallInst>(Inst)){
+    CallInst *CI = dyn_cast<CallInst>(Inst);
+    fp = CI->getCalledFunction();
+  } else if (isa<InvokeInst>(Inst)) {
+    InvokeInst *II = dyn_cast<InvokeInst>(Inst);
+    fp = II->getCalledFunction();
+  }
   if (fp != NULL) {
     visitCompareFunc(Inst);
     visitExploitation(Inst);
