@@ -22,12 +22,12 @@ cd workdir
 wget http://ftpmirror.gnu.org/binutils/binutils-2.34.tar.xz
 # or curl -O http://ftpmirror.gnu.org/binutils/binutils-2.34.tar.xz
 tar xf binutils-2.34.tar.xz
-mkdir build # Create a build dir
 ```
 
 ## 3) Build bitcode file using gclang
 ```bash
 cd binutils-2.34
+sudo apt install texinfo
 CC=gclang CXX=gclang++ CFLAGS="-fPIC" ./configure --with-pic
 make -j$(nprocs) # Build in parallel
 cd binutils/
