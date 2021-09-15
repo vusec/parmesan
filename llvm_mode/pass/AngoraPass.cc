@@ -297,7 +297,6 @@ void AngoraLLVMPass::initVariables(Module &M) {
     TraceCmp = M.getOrInsertFunction("__angora_trace_cmp", TraceCmpTy);
     if (Function *F = dyn_cast<Function>(TraceCmp)) {
       F->addAttribute(LLVM_ATTRIBUTE_LIST::FunctionIndex, Attribute::NoUnwind);
-      F->addAttribute(LLVM_ATTRIBUTE_LIST::FunctionIndex, Attribute::ReadNone);
       // F->addAttribute(1, Attribute::ZExt);
     }
 
@@ -306,7 +305,6 @@ void AngoraLLVMPass::initVariables(Module &M) {
     TraceSw = M.getOrInsertFunction("__angora_trace_switch", TraceSwTy);
     if (Function *F = dyn_cast<Function>(TraceSw)) {
       F->addAttribute(LLVM_ATTRIBUTE_LIST::FunctionIndex, Attribute::NoUnwind);
-      F->addAttribute(LLVM_ATTRIBUTE_LIST::FunctionIndex, Attribute::ReadNone);
       // F->addAttribute(LLVM_ATTRIBUTE_LIST::ReturnIndex, Attribute::ZExt);
       // F->addAttribute(1, Attribute::ZExt);
     }
@@ -318,7 +316,6 @@ void AngoraLLVMPass::initVariables(Module &M) {
     TraceCmpTT = M.getOrInsertFunction("__angora_trace_cmp_tt", TraceCmpTtTy);
     if (Function *F = dyn_cast<Function>(TraceCmpTT)) {
       F->addAttribute(LLVM_ATTRIBUTE_LIST::FunctionIndex, Attribute::NoUnwind);
-      F->addAttribute(LLVM_ATTRIBUTE_LIST::FunctionIndex, Attribute::ReadNone);
     }
 
     Type *TraceSwTtArgs[7] = {Int32Ty, Int32Ty, Int32Ty, Int32Ty,
@@ -327,7 +324,6 @@ void AngoraLLVMPass::initVariables(Module &M) {
     TraceSwTT = M.getOrInsertFunction("__angora_trace_switch_tt", TraceSwTtTy);
     if (Function *F = dyn_cast<Function>(TraceSwTT)) {
       F->addAttribute(LLVM_ATTRIBUTE_LIST::FunctionIndex, Attribute::NoUnwind);
-      F->addAttribute(LLVM_ATTRIBUTE_LIST::FunctionIndex, Attribute::ReadNone);
     }
 
     Type *TraceFnTtArgs[6] = {Int32Ty, Int32Ty, Int32Ty, Int32Ty, Int8PtrTy, Int8PtrTy};
@@ -335,7 +331,6 @@ void AngoraLLVMPass::initVariables(Module &M) {
     TraceFnTT = M.getOrInsertFunction("__angora_trace_fn_tt", TraceFnTtTy);
     if (Function *F = dyn_cast<Function>(TraceFnTT)) {
       F->addAttribute(LLVM_ATTRIBUTE_LIST::FunctionIndex, Attribute::NoUnwind);
-      F->addAttribute(LLVM_ATTRIBUTE_LIST::FunctionIndex, Attribute::ReadOnly);
     }
 
     Type *TraceExploitTtArgs[6] = {Int32Ty, Int32Ty, Int32Ty, Int32Ty, Int32Ty, Int64Ty};
@@ -344,7 +339,6 @@ void AngoraLLVMPass::initVariables(Module &M) {
                                            TraceExploitTtTy);
     if (Function *F = dyn_cast<Function>(TraceExploitTT)) {
       F->addAttribute(LLVM_ATTRIBUTE_LIST::FunctionIndex, Attribute::NoUnwind);
-      F->addAttribute(LLVM_ATTRIBUTE_LIST::FunctionIndex, Attribute::ReadNone);
     }
   }
 
@@ -685,9 +679,9 @@ void AngoraLLVMPass::processCmp(Instruction *Cond, Constant *Cid,
         IRB.CreateCall(TraceCmp, {CondExt, Cid, CurCtx, OpArg[0], OpArg[1]});
     setInsNonSan(ProxyCall);
     */
-    LoadInst *CurCid = IRB.CreateLoad(AngoraCondId);
+    LoadInst *CurCid = IRB.CreateLoad(AngoraCondId, "angora_target_cond_id");
     setInsNonSan(CurCid);
-    Value *CmpEq = IRB.CreateICmpEQ(Cid, CurCid);
+    Value *CmpEq = IRB.CreateICmpEQ(Cid, CurCid, "angora_is_target_cond");
     setValueNonSan(CmpEq);
 
     BranchInst *BI = cast<BranchInst>(
@@ -697,9 +691,9 @@ void AngoraLLVMPass::processCmp(Instruction *Cond, Constant *Cid,
     IRBuilder<> ThenB(BI);
     OpArg[0] = castArgType(ThenB, OpArg[0]);
     OpArg[1] = castArgType(ThenB, OpArg[1]);
-    Value *CondExt = ThenB.CreateZExt(Cond, Int32Ty);
+    Value *CondExt = ThenB.CreateZExt(Cond, Int32Ty, "angora_cond_result");
     setValueNonSan(CondExt);
-    LoadInst *CurCtx = ThenB.CreateLoad(AngoraContext);
+    LoadInst *CurCtx = ThenB.CreateLoad(AngoraContext, "angora_context");
     setInsNonSan(CurCtx);
     CallInst *ProxyCall =
         ThenB.CreateCall(TraceCmp, {CondExt, Cid, CurCtx, OpArg[0], OpArg[1]});
