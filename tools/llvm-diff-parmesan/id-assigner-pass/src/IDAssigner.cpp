@@ -92,6 +92,7 @@ Constant *ParmeSanDummyCall;
 void IDAssigner::collectCallSiteDominators(Function *F) {
     for (auto &BB : *F) {
       CallSiteIdType PrevCallSiteId;
+      bool HasPrevCallSiteId = false;
       for (auto &I : BB) {
           if (StoreInst *SI = dyn_cast<StoreInst>(&I)) {
               Value *V = SI->getPointerOperand();
@@ -102,6 +103,7 @@ void IDAssigner::collectCallSiteDominators(Function *F) {
                     if (CV) {
                         if (ConstantInt *ConstInt = dyn_cast<ConstantInt>(CV)) {
                             PrevCallSiteId = ConstInt->getZExtValue();
+                            HasPrevCallSiteId = true;
                         }
                     }
                 }
@@ -130,7 +132,8 @@ void IDAssigner::collectCallSiteDominators(Function *F) {
                     }
 
                   }
-                  CallSiteDominatorsMap[PrevCallSiteId] = CSDominatorCmpIds; 
+                  if (HasPrevCallSiteId)
+                    CallSiteDominatorsMap[PrevCallSiteId] = CSDominatorCmpIds; 
                   
               }
           }
