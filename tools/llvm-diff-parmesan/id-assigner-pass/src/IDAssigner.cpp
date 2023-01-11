@@ -437,6 +437,9 @@ void IDAssigner::addCustomTargetsFromFile(const std::string Path, Module *M) {
             static const std::string Xlibs("/usr/");
             if (filename.empty() || line == 0 || !filename.compare(0, Xlibs.size(), Xlibs))
                 continue;
+            std::size_t found0 = filename.find_last_of("/\\");
+            if (found0 != std::string::npos)
+              filename = filename.substr(found0 + 1);
             for (auto &target : targets) {
                 std::size_t found = target.find_last_of("/\\");
                 if (found != std::string::npos)
