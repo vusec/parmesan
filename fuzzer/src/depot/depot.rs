@@ -11,6 +11,7 @@ use std::{
         atomic::{AtomicUsize, Ordering},
         Mutex, RwLock,
     },
+    time::{SystemTime, UNIX_EPOCH},
 };
 // https://crates.io/crates/priority-queue
 use angora_common::config;
@@ -23,6 +24,14 @@ pub struct Depot {
     pub num_crashes: AtomicUsize,
     pub dirs: DepotDir,
     pub cfg: RwLock<ControlFlowGraph>,
+    pub start_time: u128,
+}
+
+macro_rules! get_cur_time {
+    () => {{
+        SystemTime::now().duration_since(UNIX_EPOCH)
+            .expect("Cannot get timestamp").as_millis()
+    }}
 }
 
 impl Depot {
@@ -33,7 +42,7 @@ impl Depot {
             num_hangs: AtomicUsize::new(0),
             num_crashes: AtomicUsize::new(0),
             dirs: DepotDir::new(in_dir, out_dir),
-            cfg
+            cfg, start_time: get_cur_time!()
         }
     }
 
@@ -43,6 +52,7 @@ impl Depot {
         num: &AtomicUsize,
         cmpid: u32,
         dir: &Path,
+        time: Option<u128>
     ) -> usize {
         let id = num.fetch_add(1, Ordering::Relaxed);
         trace!(
@@ -51,7 +61,7 @@ impl Depot {
             status,
             cmpid
         );
-        let new_path = get_file_name(dir, id);
+        let new_path = get_file_name(dir, id, time);
         let mut f = fs::File::create(new_path.as_path()).expect("Could not save new input file.");
         f.write_all(buf)
             .expect("Could not write seed buffer to file.");
@@ -62,10 +72,10 @@ impl Depot {
     pub fn save(&self, status: StatusType, buf: &Vec<u8>, cmpid: u32) -> usize {
         match status {
             StatusType::Normal => {
-                Self::save_input(&status, buf, &self.num_inputs, cmpid, &self.dirs.inputs_dir)
+                Self::save_input(&status, buf, &self.num_inputs, cmpid, &self.dirs.inputs_dir, None)
             },
             StatusType::Timeout => {
-                Self::save_input(&status, buf, &self.num_hangs, cmpid, &self.dirs.hangs_dir)
+                Self::save_input(&status, buf, &self.num_hangs, cmpid, &self.dirs.hangs_dir, None)
             },
             StatusType::Crash => Self::save_input(
                 &status,
@@ -73,6 +83,7 @@ impl Depot {
                 &self.num_crashes,
                 cmpid,
                 &self.dirs.crashes_dir,
+                Some(get_cur_time!() - self.start_time)
             ),
             _ => 0,
         }
@@ -87,7 +98,7 @@ impl Depot {
     }
 
     pub fn get_input_buf(&self, id: usize) -> Vec<u8> {
-        let path = get_file_name(&self.dirs.inputs_dir, id);
+        let path = get_file_name(&self.dirs.inputs_dir, id, None);
         read_from_file(&path)
     }
 
